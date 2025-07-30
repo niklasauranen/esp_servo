@@ -1,5 +1,8 @@
 #include <ESP32Servo.h>
 #include <Wire.h>
+/*simple interface for testing servo motor control on esp32. Currently 
+implemented for 2 180-deg 500-2500us 50hz servos*/
+
 Servo myservo1;
 Servo myservo2;
 
@@ -42,6 +45,8 @@ void routine(){
   myservo1.write(90);
   myservo2.write(90);
   delay(2000);
+
+  Serial.println("routine done");
 }
 
 void sweep(){
@@ -58,35 +63,39 @@ void sweep(){
     myservo1.write(180-i);
     delay(50);
   }
+  Serial.println("sweep done");
 }
 
 void angle(){
   int number;
   bool setangle = true;
   while(setangle){
-    Serial.println("enter angle");
+    bool numerical = false;
+    Serial.println("enter angle (q to quit)");
     while (Serial.available()==0){}
-    number = Serial.parseInt();
-    Serial.println(number);
-    if(number <= 180 && number > 0){
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+    Serial.println(input);
+
+    if(input == "q" || input == "Q"){
+      setangle = false;
+    }
+    else{
+      number = input.toInt();
+      numerical = true;
+    }
+    if(number >= 0 && number <= 180){
       myservo1.write(number);
       myservo2.write(number);
     }
-
-    else{
-      Serial.println("quit angle? (y/n)");
-      while (Serial.available()==0){}
-      String acom = Serial.readString();
-      acom.trim();
-      if(acom == "y"){ // fix
-        setangle = false;
-      }
+    else if(numerical){
+      Serial.println("Unknown angle, enter a value between 0-180 deg.");
     }
   }
 }
 
 void loop() {
-  Serial.println("enter command");
+  Serial.println("enter command: ");
   while (Serial.available()==0){}
   String com = Serial.readString();
   com.trim();
@@ -124,7 +133,7 @@ void loop() {
     angle();
   }
   else{
-    Serial.println("unknown command brotesserie chicken");
+    Serial.println("unknown command");
   }
   delay(150);
 }

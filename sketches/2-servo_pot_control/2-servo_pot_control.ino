@@ -2,6 +2,8 @@
 #include <ESP32Servo.h> 
 #include <cmath>
 #include <Wire.h>
+/*Implementation of potentiometer control for 2 180 deg 500-2500us 50hz servos on esp32.
+A push-down button is used to choose which servo is driven by the potentiometer. */
 Servo myservo1;
 Servo myservo2;
 int servo1Pin = 18;
@@ -32,7 +34,7 @@ void setup()
 
   myservo1.setPeriodHertz(50);
   myservo2.setPeriodHertz(50);
-  myservo1.attach(servo1Pin, 500, 2500);
+  myservo1.attach(servo1Pin, 500, 2500); // PWM of 500-2500 for both servos
   myservo2.attach(servo2Pin, 500, 2500);
 
   pinMode(buttonPin, INPUT_PULLUP);
@@ -70,7 +72,7 @@ void loop() {
     //if(PreVal1-20 <= ScaledVal && ScaledVal <= PreVal1 + 20){
       if(abs(ScaledVal - PreVal1) >= buffer){
           myservo1.attach(servo1Pin, 500, 2500);
-          Serial.println("Servo 1    ");
+          Serial.println("Servo 1    ");git 
           Serial.print(ScaledVal);
           Serial.print(" ");
           Serial.print(PreVal1);
