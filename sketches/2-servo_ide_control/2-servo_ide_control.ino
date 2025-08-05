@@ -45,6 +45,12 @@ void routine(){
   myservo1.write(90);
   myservo2.write(90);
   delay(2000);
+  myservo1.write(180);
+  myservo2.write(180);
+  delay(2000);
+  myservo1.write(0);
+  myservo2.write(0);
+  delay(2000);
 
   Serial.println("routine done");
 }
@@ -56,12 +62,12 @@ void sweep(){
   for(int i =0; i<=180; ++i){
     myservo2.write(i);
     myservo1.write(180-i);
-    delay(50);
+    delay(10);
   }
   for(int i =180; i>=0; --i){
     myservo2.write(i);
     myservo1.write(180-i);
-    delay(50);
+    delay(10);
   }
   Serial.println("sweep done");
 }
