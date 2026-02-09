@@ -1,8 +1,6 @@
 #include <ESP32Servo.h>
-
-// =======================
-// Servo setup
-// =======================
+/*An ide control interface for 4 servos on esp32. 
+Created to map the dynamics of the setup*/
 Servo servo1;
 Servo servo2;
 Servo servo3;
@@ -13,15 +11,9 @@ constexpr int SERVO2_PIN = 18;
 constexpr int SERVO3_PIN = 23;
 constexpr int SERVO4_PIN = 22;
 
-// =======================
-// Serial command buffer
-// =======================
 char cmdBuf[32];
 uint8_t cmdIdx = 0;
 
-// =======================
-// Motion state machine
-// =======================
 enum Mode {
   IDLE,
   ROUTINE,
@@ -40,9 +32,6 @@ uint8_t routineStep = 0;
 int sweepPos = 0;
 int sweepDir = 1;
 
-// =======================
-// Helper functions
-// =======================
 void setAll(int a, int b, int c, int d) {
   servo1.write(a);
   servo2.write(b);
@@ -77,7 +66,7 @@ void runRoutine() {
   }
   routineStep++;
 }
-
+//Sweep currently implemented for 2 servos only
 void startSweep() {
   mode = SWEEP;
   sweepPos = 0;
@@ -103,9 +92,6 @@ void runSweep() {
   }
 }
 
-// =======================
-// Command handler
-// =======================
 void handleCommand(const char *cmd) {
   Serial.print("Command received: ");
   Serial.println(cmd);
@@ -135,9 +121,6 @@ void handleCommand(const char *cmd) {
   Serial.println("enter command:");
 }
 
-// =======================
-// Setup
-// =======================
 void setup() {
   Serial.begin(115200);
   delay(200);
@@ -165,12 +148,8 @@ void setup() {
   Serial.println("enter command:");
 }
 
-// =======================
-// Main loop (NON-BLOCKING)
-// =======================
 void loop() {
 
-  // --- Serial input ---
 while (Serial.available()) {
   char c = Serial.read();
 
@@ -189,7 +168,6 @@ while (Serial.available()) {
 }
 
 
-  // --- Motion tasks ---
   switch (mode) {
     case ROUTINE:
       runRoutine();
