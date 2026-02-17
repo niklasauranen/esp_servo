@@ -143,8 +143,7 @@ void startRSweep() {
 
 void Phase1() {
   if(phase_1 && !phase_2 && !phase_3){
-    Serial.println("on 1");
-    if (millis() - lastStepTime < 2) return;
+    if (millis() - lastStepTime < 10) return;
     lastStepTime = millis();
     
       servo1.write(sweepPos1);
@@ -160,7 +159,7 @@ void Phase1() {
         prestep = step;
       }
 
-      if (abs(sweepPos1 - phase1targetPos1) <= 2 && abs(sweepPos4 - phase1targetPos4) <= 2) {
+      if (abs(sweepPos1 - phase1targetPos1) <= 1 && abs(sweepPos4 - phase1targetPos4) <= 1) {
         Serial.println("Phase 1 done");
         step=0;
         prestep=0;
@@ -182,11 +181,12 @@ void Phase1() {
 
 void Phase2(){
   if(!phase_1 && phase_2 && !phase_3){
-   Serial.println("on 2");
+  if (millis() - lastStepTime < 10) return;
+  lastStepTime = millis();
     servo2.write(sweepPos2);
     servo4.write(sweepPos4);
     
-    if(abs(sweepPos4 - phase2targetPos4) > 2){
+    if(abs(sweepPos4 - phase2targetPos4) > 1){
       sweepPos4 += sweepDir;
     }
 
@@ -196,7 +196,7 @@ void Phase2(){
 
     step +=1;
 
-    if (abs(sweepPos2 - phase2targetPos2) <= 2 && abs(sweepPos4 - phase2targetPos4) <= 2) {
+    if (abs(sweepPos2 - phase2targetPos2) <= 1 && abs(sweepPos4 - phase2targetPos4) <= 1) {
       Serial.println("phase 2 done");
       step = 0;
       prestep = 0;
@@ -216,24 +216,23 @@ void Phase2(){
 
 void Phase3(){
 
-  if (millis() - lastStepTime < 2) return;
-    lastStepTime = millis();
-
     if(!phase_1 && !phase_2 && phase_3){
-      Serial.println("on 3");
+    if (millis() - lastStepTime < 10) return;
+    lastStepTime = millis();
       servo3.write(sweepPos3);
       servo4.write(sweepPos4);
-    if(abs(sweepPos3 - phase3targetPos3 ) >=2 && step%40 != 0){
+    if(abs(sweepPos3 - phase3targetPos3 ) >=1 && step%40 != 0){
 
       sweepPos3 -= sweepDir;
     
     }
 
-    if(abs(sweepPos4 - phase3targetPos4) >=2){
+    if(abs(sweepPos4 - phase3targetPos4) >=1){
       sweepPos4 -= sweepDir;
-      step +=1;
     }
-    if (abs(sweepPos3 - phase3targetPos3) <= 2 && abs(sweepPos4 - phase3targetPos4) <= 2) {
+
+    step +=1;
+    if (abs(sweepPos3 - phase3targetPos3) <= 1 && abs(sweepPos4 - phase3targetPos4) <= 1) {
       Serial.println("phase 3 done");
       if(mode == SWEEP){
         mode = IDLE;
@@ -322,6 +321,9 @@ void handleCommand(const char *cmd) {
     }
     else if (!strcmp(cmd, "rsweep")) {
       startRSweep();
+    }
+    else if (!strcmp(cmd, "mode")) {
+      Serial.println(mode);
     }
     else {
       Serial.println("unknown command");
