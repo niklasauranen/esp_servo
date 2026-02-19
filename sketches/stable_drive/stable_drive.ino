@@ -51,7 +51,7 @@ bool phase_3 = false;
 
 int sweepDir;
 int step = 0;
-int prestep=0;
+int prestep = 0;
 
 void setAll(int a, int b, int c, int d) {
   servo1.write(a);
@@ -61,18 +61,18 @@ void setAll(int a, int b, int c, int d) {
 }
 
 void setOne(char M, int ang) {
-    if(M == 'a'){
-        servo1.write(ang);
-    }
-    if(M == 'b'){
-        servo2.write(ang);
-    }
-    if(M == 'c'){
-        servo3.write(ang);
-    }
-    if(M == 'd'){
-        servo4.write(ang);
-    }
+  if (M == 'a') {
+    servo1.write(ang);
+  }
+  if (M == 'b') {
+    servo2.write(ang);
+  }
+  if (M == 'c') {
+    servo3.write(ang);
+  }
+  if (M == 'd') {
+    servo4.write(ang);
+  }
 }
 
 void startSweep() {
@@ -91,7 +91,7 @@ void startSweep() {
 
   phase3targetPos3 = 0;
   phase3targetPos4 = 20;
-  
+
   phase_1 = true;
   phase_2 = false;
   phase_3 = false;
@@ -101,10 +101,10 @@ void startSweep() {
   Serial.println(phase_3);
 
   sweepDir = 1;
-  
 
-  setAll(sweepPos1,sweepPos2,sweepPos3,sweepPos4);
 
+  setAll(sweepPos1, sweepPos2, sweepPos3, sweepPos4);
+  delay(2000);
   lastStepTime = millis();
 }
 
@@ -128,123 +128,119 @@ void startRSweep() {
   Serial.println(phase_1);
   Serial.println(phase_2);
   Serial.println(phase_3);
-  
+
   phase_1 = false;
   phase_2 = false;
   phase_3 = true;
 
   sweepDir = -1;
-  
 
-  setAll(sweepPos1,sweepPos2,sweepPos3,sweepPos4);
+
+  setAll(sweepPos1, sweepPos2, sweepPos3, sweepPos4);
+  delay(2000);
 
   lastStepTime = millis();
 }
 
 void Phase1() {
-  if(phase_1 && !phase_2 && !phase_3){
+  if (phase_1 && !phase_2 && !phase_3) {
     if (millis() - lastStepTime < 10) return;
     lastStepTime = millis();
-    
-      servo1.write(sweepPos1);
-      servo4.write(sweepPos4);
 
-      if(abs(sweepPos1 - phase1targetPos1) > 1){
-        sweepPos1 -= sweepDir;
-        step +=1;
+    servo1.write(sweepPos1);
+    servo4.write(sweepPos4);
 
+    if (abs(sweepPos1 - phase1targetPos1) > 1) {
+      sweepPos1 -= sweepDir;
+      step += 1;
+    }
+    if (abs(sweepPos4 - phase1targetPos4) > 1 && abs(step - prestep) >= 20) {
+      sweepPos4 -= sweepDir;
+      prestep = step;
+    }
+
+    if (abs(sweepPos1 - phase1targetPos1) <= 1 && abs(sweepPos4 - phase1targetPos4) <= 1) {
+      Serial.println("Phase 1 done");
+      step = 0;
+      prestep = 0;
+      if (mode == RSWEEP) {
+        mode = IDLE;
       }
-      if(abs(sweepPos4 - phase1targetPos4) > 1 && abs(step-prestep) >= 20){
-        sweepPos4 -= sweepDir;
-        prestep = step;
-      }
 
-      if (abs(sweepPos1 - phase1targetPos1) <= 1 && abs(sweepPos4 - phase1targetPos4) <= 1) {
-        Serial.println("Phase 1 done");
-        step=0;
-        prestep=0;
-        if(mode == RSWEEP){
-          mode = IDLE;
-        }
-
-        else{
-          phase_1 = false;
-          phase_2 = true;
-        }
+      else {
+        phase_1 = false;
+        phase_2 = true;
       }
     }
-    
-    else{
-      return;
-    }
+  }
+
+  else {
+    return;
+  }
 }
 
-void Phase2(){
-  if(!phase_1 && phase_2 && !phase_3){
-  if (millis() - lastStepTime < 10) return;
-  lastStepTime = millis();
+void Phase2() {
+  if (!phase_1 && phase_2 && !phase_3) {
+    if (millis() - lastStepTime < 10) return;
+    lastStepTime = millis();
     servo2.write(sweepPos2);
     servo4.write(sweepPos4);
-    
-    if(abs(sweepPos4 - phase2targetPos4) > 1){
+
+    if (abs(sweepPos4 - phase2targetPos4) > 1) {
       sweepPos4 += sweepDir;
     }
 
-    if(abs(sweepPos2 - phase2targetPos2) > 1 && step%4 != 0){
+    if (abs(sweepPos2 - phase2targetPos2) > 1 && step % 6 != 0) {
       sweepPos2 -= sweepDir;
-      }
+    }
 
-    step +=1;
+    step += 1;
 
     if (abs(sweepPos2 - phase2targetPos2) <= 1 && abs(sweepPos4 - phase2targetPos4) <= 1) {
       Serial.println("phase 2 done");
       step = 0;
       prestep = 0;
       phase_2 = false;
-      if(mode == RSWEEP){
-        phase_1 = true;  
-      }
-      else{
+      if (mode == RSWEEP) {
+        phase_1 = true;
+      } else {
         phase_3 = true;
       }
     }
-  }
-  else{
+  } else {
     return;
   }
 }
 
-void Phase3(){
+void Phase3() {
 
-    if(!phase_1 && !phase_2 && phase_3){
+  if (!phase_1 && !phase_2 && phase_3) {
     if (millis() - lastStepTime < 10) return;
     lastStepTime = millis();
-      servo3.write(sweepPos3);
-      servo4.write(sweepPos4);
-    if(abs(sweepPos3 - phase3targetPos3 ) >=1 && step%40 != 0){
+    servo3.write(sweepPos3);
+    servo4.write(sweepPos4);
+    if (abs(sweepPos3 - phase3targetPos3) >= 1 && step % 40 != 0) {
 
       sweepPos3 -= sweepDir;
-    
     }
 
-    if(abs(sweepPos4 - phase3targetPos4) >=1){
+    if (abs(sweepPos4 - phase3targetPos4) >= 1) {
       sweepPos4 -= sweepDir;
     }
 
-    step +=1;
+    step += 1;
     if (abs(sweepPos3 - phase3targetPos3) <= 1 && abs(sweepPos4 - phase3targetPos4) <= 1) {
       Serial.println("phase 3 done");
-      if(mode == SWEEP){
+      if (mode == SWEEP) {
         mode = IDLE;
       }
 
-      else{
+      else {
         phase_3 = false;
         phase_2 = true;
       }
     }
-  }
-  else{
+  } else {
     return;
   }
 }
@@ -255,14 +251,14 @@ void handleCommand(const char *cmd) {
   Serial.print("Command received: ");
   Serial.println(cmd);
 
-  if(mode == ANGLE){
+  if (mode == ANGLE) {
     if (!strcmp(cmd, "q")) {
       mode = IDLE;
       return;
     }
     int angle;
     char motor;
-    
+
     if (sscanf(cmd, " %c %d", &motor, &angle) == 2) {
 
       if (motor >= '1' && motor <= '4') {
@@ -284,55 +280,41 @@ void handleCommand(const char *cmd) {
     return;
 
   }
-  
-  else{
+
+  else {
     if (!strcmp(cmd, "180")) {
       setAll(180, 180, 180, 180);
-    }
-    else if (!strcmp(cmd, "0")) {
+    } else if (!strcmp(cmd, "0")) {
       setAll(0, 0, 0, 0);
-    }
-    else if (!strcmp(cmd, "90")) {
+    } else if (!strcmp(cmd, "90")) {
       setAll(90, 90, 90, 90);
-    }
-    else if (!strcmp(cmd, "up")) {
+    } else if (!strcmp(cmd, "up")) {
       setAll(180, 70, 130, 85);
-    }
-    else if (!strcmp(cmd, "upl")) {
+    } else if (!strcmp(cmd, "upl")) {
       setAll(0, 70, 130, 76);
-    }
-    else if (!strcmp(cmd, "down")) {
+    } else if (!strcmp(cmd, "down")) {
       setAll(0, 0, 0, 20);
-    }
-    else if (!strcmp(cmd, "p1")) {
+    } else if (!strcmp(cmd, "p1")) {
       setAll(0, 70, 130, 76);
-    }
-    else if (!strcmp(cmd, "p2")) {
+    } else if (!strcmp(cmd, "p2")) {
       setAll(0, 0, 130, 158);
-    }
-    else if (!strcmp(cmd, "p3")) {
+    } else if (!strcmp(cmd, "p3")) {
       setAll(0, 0, 0, 25);
-    }
-    else if (!strcmp(cmd, "angle")) {
+    } else if (!strcmp(cmd, "angle")) {
       mode = ANGLE;
-    }  
-    else if (!strcmp(cmd, "sweep")) {
+    } else if (!strcmp(cmd, "sweep")) {
       startSweep();
-    }
-    else if (!strcmp(cmd, "rsweep")) {
+    } else if (!strcmp(cmd, "rsweep")) {
       startRSweep();
-    }
-    else if (!strcmp(cmd, "mode")) {
+    } else if (!strcmp(cmd, "mode")) {
       Serial.println(mode);
-    }
-    else {
+    } else {
       Serial.println("unknown command");
     }
   }
-  if(mode == ANGLE){
+  if (mode == ANGLE) {
     Serial.println("enter motor [1,4]");
-  }
-  else{
+  } else {
     Serial.println("enter command:");
   }
 }
@@ -341,7 +323,7 @@ void setup() {
   Serial.begin(115200);
   delay(200);
   while (Serial.available()) Serial.read();
-  
+
 
 
   Serial.setRxBufferSize(256);
@@ -350,7 +332,7 @@ void setup() {
   ESP32PWM::allocateTimer(1);
   ESP32PWM::allocateTimer(2);
   ESP32PWM::allocateTimer(3);
-/*  */
+  /*  */
   servo1.setPeriodHertz(50);
   servo2.setPeriodHertz(50);
   servo3.setPeriodHertz(50);
@@ -366,22 +348,21 @@ void setup() {
 
 void loop() {
 
-while (Serial.available()) {
-  char c = Serial.read();
+  while (Serial.available()) {
+    char c = Serial.read();
 
-  if (c >= 'A' && c <= 'Z') c += 32;
+    if (c >= 'A' && c <= 'Z') c += 32;
 
-  if (c == '\n' || c == '\r') {
-    if (cmdIdx > 0) {
-      cmdBuf[cmdIdx] = '\0';
-      handleCommand(cmdBuf);
-      cmdIdx = 0;
+    if (c == '\n' || c == '\r') {
+      if (cmdIdx > 0) {
+        cmdBuf[cmdIdx] = '\0';
+        handleCommand(cmdBuf);
+        cmdIdx = 0;
+      }
+    } else if (cmdIdx < sizeof(cmdBuf) - 1) {
+      cmdBuf[cmdIdx++] = c;
     }
   }
-  else if (cmdIdx < sizeof(cmdBuf) - 1) {
-    cmdBuf[cmdIdx++] = c;
-  }
-}
 
 
   switch (mode) {
@@ -402,4 +383,3 @@ while (Serial.available()) {
       break;
   }
 }
-	
