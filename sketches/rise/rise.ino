@@ -99,6 +99,7 @@ void rise(){
     initPos4 += dir;
   }
   if(abs(initPos3 - targetPos3) <= 1){
+    Serial.println("manouver done");
     mode = IDLE;
   }
 }
@@ -120,9 +121,6 @@ void handleCommand(const char *cmd) {
   }
   if (!strcmp(cmd, "mode")) {
     Serial.println(mode);
-  }
-  else {
-    Serial.println("unknown command");
   }
 
   Serial.println("enter command:");
