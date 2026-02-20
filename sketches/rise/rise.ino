@@ -6,7 +6,7 @@ Servo servo3;
 Servo servo4;
 
 constexpr int SERVO1_PIN = 19;
-constexpr int SERVO2_PIN = 22;
+constexpr int SERVO2_PIN = 4;
 constexpr int SERVO3_PIN = 23;
 constexpr int SERVO4_PIN = 18;
 
@@ -47,14 +47,14 @@ void initRise(){
   targetPos1 = 180;
   targetPos2 = 70;
   targetPos3 = 130;
-  targetPos4 = 85;
+  targetPos4 = 90;
 
   dir = 1;
 
   initPos1 = 0;
   initPos2 = 0;
-  initPos3 = 0;
-  initPos4 = 20;
+  initPos3 = 3;
+  initPos4 = 30;
 
   setAll(initPos1, initPos2, initPos3, initPos4);
 }
@@ -63,15 +63,15 @@ void initLower(){
 
   targetPos1 = 0;
   targetPos2 = 0;
-  targetPos3 = -1;
-  targetPos4 = 20;
+  targetPos3 = 3;
+  targetPos4 = 30;
 
   dir = -1;
 
   initPos1 = 0;
   initPos2 = 70;
   initPos3 = 135;
-  initPos4 = 85;
+  initPos4 = 90;
 
   setAll(initPos1, initPos2, initPos3, initPos4);
 }
