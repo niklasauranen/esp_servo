@@ -1,4 +1,11 @@
 #include <ESP32Servo.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define OLED_ADDR   0x3C
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
+
 /*stable platform config. jaottelu & reverse*/
 Servo servo1;
 Servo servo2;
@@ -24,6 +31,10 @@ int  initPos2;
 int  initPos3;
 int  initPos4;
 
+const String LOWTEXT = "lowering..";
+const String HIGHTEXT = "rising..";
+const String STBYTEXT = "standing by..";
+
 enum Mode {
   IDLE,
   RISE,
@@ -34,6 +45,18 @@ Mode mode = IDLE;
 
 char cmdBuf[32];
 uint8_t cmdIdx = 0;
+
+void useDisplay(const String text){
+
+  display.clearDisplay();
+  display.setTextColor(WHITE);
+  display.setTextSize(1.8);
+  display.setCursor(20, 20);
+  display.clearDisplay();
+  display.println(text);
+  display.display();
+
+}
 
 void setAll(int a, int b, int c, int d){
   servo1.write(a);
@@ -47,14 +70,14 @@ void initRise(){
   targetPos1 = 180;
   targetPos2 = 70;
   targetPos3 = 130;
-  targetPos4 = 90;
+  targetPos4 = 85;
 
   dir = 1;
 
   initPos1 = 0;
   initPos2 = 0;
   initPos3 = 3;
-  initPos4 = 30;
+  initPos4 = 20;
 
   setAll(initPos1, initPos2, initPos3, initPos4);
 }
@@ -64,19 +87,19 @@ void initLower(){
   targetPos1 = 0;
   targetPos2 = 0;
   targetPos3 = 3;
-  targetPos4 = 30;
+  targetPos4 = 20;
 
   dir = -1;
 
   initPos1 = 0;
   initPos2 = 70;
   initPos3 = 135;
-  initPos4 = 90;
+  initPos4 = 85;
 
   setAll(initPos1, initPos2, initPos3, initPos4);
 }
 
-void rise(){
+void move(){
 
   if (millis() - lastStepTime < 2) return;
   lastStepTime = millis();
@@ -111,19 +134,22 @@ void handleCommand(const char *cmd) {
 
   if (!strcmp(cmd, "rise")) {
     mode = RISE;
+    useDisplay(HIGHTEXT);
     initRise();
     delay(200);
   }  
   if (!strcmp(cmd, "low")) {
     mode = LOWER;
+    useDisplay(LOWTEXT);
     initLower();
-    delay(200);
+    delay(200); 
   }
   if (!strcmp(cmd, "mode")) {
     Serial.println(mode);
   }
 
   Serial.println("enter command:");
+
 }
 
 void setup() {
@@ -132,6 +158,8 @@ void setup() {
   while (Serial.available()) Serial.read();
 
 
+  display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR);
+  useDisplay(STBYTEXT);
 
   Serial.setRxBufferSize(256);
 
@@ -173,10 +201,10 @@ void loop() {
 
   switch(mode){
     case RISE:
-      rise();
+      move();
       break;
     case LOWER:
-      rise();
+      move();
       break;
     case IDLE:
       default:
